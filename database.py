@@ -14,40 +14,48 @@ DATABASE_URL = os.getenv('DATABASE_URL')
 
 def init_db():
     """데이터베이스 테이블 생성"""
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
-    
-    # analyses 테이블 생성
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS analyses (
-            id SERIAL PRIMARY KEY,
-            telegram_id TEXT,
-            input_data JSONB,
-            result JSONB,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )
-    """)
-    
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        
+        # analyses 테이블 생성
+        cur.execute("""
+            CREATE TABLE IF NOT EXISTS analyses (
+                id SERIAL PRIMARY KEY,
+                telegram_id TEXT,
+                input_data JSONB,
+                result JSONB,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("데이터베이스 초기화 성공")
+    except Exception as e:
+        print(f"데이터베이스 초기화 실패 (무시하고 계속 진행): {e}")
 
 def save_analysis(telegram_id: str, input_data: dict, result: dict):
     """분석 결과 저장"""
-    conn = psycopg2.connect(DATABASE_URL)
-    cur = conn.cursor()
-    
-    cur.execute(
-        """
-        INSERT INTO analyses (telegram_id, input_data, result)
-        VALUES (%s, %s, %s)
-        """,
-        (str(telegram_id), json.dumps(input_data), json.dumps(result))
-    )
-    
-    conn.commit()
-    cur.close()
-    conn.close()
+    try:
+        conn = psycopg2.connect(DATABASE_URL)
+        cur = conn.cursor()
+        
+        cur.execute(
+            """
+            INSERT INTO analyses (telegram_id, input_data, result)
+            VALUES (%s, %s, %s)
+            """,
+            (str(telegram_id), json.dumps(input_data), json.dumps(result))
+        )
+        
+        conn.commit()
+        cur.close()
+        conn.close()
+        print("분석 결과 저장 성공")
+    except Exception as e:
+        print(f"분석 결과 저장 실패 (무시하고 계속 진행): {e}")
 
 def get_user_analyses(telegram_id: str, limit: int = 5):
     """사용자의 최근 분석 결과 조회"""
