@@ -19,11 +19,15 @@ import os
 import asyncio
 from typing import Dict, Optional
 import anthropic
+from dotenv import load_dotenv
 from langchain.prompts import ChatPromptTemplate
 import warnings
 
 # SQLite 관련 경고 무시
 warnings.filterwarnings('ignore', category=UserWarning, module='langchain')
+
+# 환경 변수 로드
+load_dotenv()
 
 class LangChainService:
     """
@@ -57,88 +61,91 @@ class LangChainService:
         
         # 1단계: 기본 정보 정리 및 요약
         self.summary_prompt = ChatPromptTemplate.from_messages([
-            ("system", """당신은 전문적인 분석가입니다.
-            제공된 정보를 바탕으로 명확하고 체계적인 분석 보고서를 작성해주세요.
+            ("system", """당신은 특허 명세서 작성 전문가입니다.
+            제공된 기술 정보를 바탕으로 체계적인 특허 명세서 초안을 작성해주세요.
             
             다음 형식을 정확히 따라주세요:
             
-            # 제목
-            [한 줄로 5단어 이내]
+            # 발명의 명칭
+            [기술의 특징을 나타내는 간단명료한 제목]
             
-            # 핵심 내용
-            [한 줄로 10단어 이내]
+            # 기술 분야
+            [본 발명이 속하는 기술 분야 설명]
             
-            # 상세 설명
-            [3-4문장으로 주요 특징과 장점을 설명]
+            # 배경 기술
+            - 종래 기술: [기존 기술의 현황]
+            - 문제점: [해결하고자 하는 과제]
+            - 필요성: [본 발명의 필요성]
             
-            # 배경 분석
-            - 현재 상황: [현재 상태 한 줄 설명]
-            - 해결 방안: [한 줄로 설명]
-            - 차별점: [한 줄로 설명]
-            - 범위: [대상/규모를 구체적으로 설명]
+            # 해결 과제
+            [본 발명이 해결하고자 하는 기술적 과제를 구체적으로 설명]
             
-            # 실행 계획
-            [3-4문장으로 구현 방법과 필요한 자원을 설명]
+            # 과제 해결 수단
+            - 구성: [주요 구성요소와 작동 원리]
+            - 특징: [기술적 특징과 차별점]
+            - 효과: [기대되는 기술적 효과]
             
-            # 기대 효과
-            - 주요 효과: [한 줄로 설명]
-            - 부가 효과: [한 줄로 설명]
-            - 지속성: [한 줄로 설명]
+            # 발명의 효과
+            - 기술적 효과: [성능/효율 개선 등]
+            - 경제적 효과: [비용/생산성 측면]
+            - 산업적 효과: [적용 분야/시장성]
             
             주의사항:
             1. 각 섹션의 제목은 반드시 '# ' 으로 시작
             2. 리스트 항목은 반드시 '- ' 으로 시작
             3. 모든 내용은 들여쓰기 없이 작성
             4. 빈 줄은 섹션 구분에만 사용
-            5. 구체적인 예시와 수치 포함"""),
+            5. 기술 용어를 정확하게 사용
+            6. 구체적인 수치와 실시예 포함"""),
             
-            ("human", """아이디어: {idea}
-            분야: {category}
-            형태: {approach}
-            타겟: {target}
-            문제: {problem}
-            해결방안: {solution}
-            구현기술: {implementation}
-            목표: {goals}
-            필요사항: {needs}""")
+            ("human", """기술 개요: {idea}
+            문제점: {problem}
+            작동원리: {mechanism}
+            차별점: {difference}
+            구성요소: {components}
+            기술효과: {effects}
+            기술한계: {limitations}
+            산업분야: {industry}
+            물리특성: {specifications}
+            개발상태: {status}""")
         ])
         
         # 2단계: 상세 분석 및 제안
         self.analysis_prompt = ChatPromptTemplate.from_messages([
-            ("system", """당신은 전문적인 컨설턴트입니다.
+            ("system", """당신은 특허 심사 전문가입니다.
 
-            1단계에서 정리된 내용을 바탕으로 상세 분석을 수행하고 제안을 해주세요.
+            1단계에서 작성된 명세서 초안을 바탕으로 상세 분석을 수행하고 보완점을 제시해주세요.
 
             다음 형식으로 응답해주세요:
 
-            # 유사 사례
-            - [사례 1]: 특징, 분야, 성공/실패 요인
-            - [사례 2]: 특징, 분야, 성공/실패 요인
-            - [사례 3]: 특징, 분야, 성공/실패 요인
+            # 선행기술 분석
+            - [기술 1]: 특허번호, 기술적 특징, 차이점
+            - [기술 2]: 특허번호, 기술적 특징, 차이점
+            - [기술 3]: 특허번호, 기술적 특징, 차이점
 
-            # 실현 가능성
-            - 기술: [필요한 기술과 난이도]
-            - 자원: [필요한 자원]
-            - 기간: [예상 소요 기간]
-            - 제약: [예상되는 어려움]
+            # 기술적 실현성
+            - 구현성: [기술적 구현 가능성]
+            - 완성도: [현재 기술 완성도]
+            - 검증: [필요한 시험/검증]
+            - 제약: [기술적 제약사항]
 
-            # 발전 방향
-            - 단기: [1-3개월 목표]
-            - 중기: [3-6개월 목표]
-            - 장기: [6개월 이상 목표]
-            - 계획: [실행 단계]
+            # 기술 발전성
+            - 개선점: [성능/효율 개선]
+            - 응용: [타 분야 적용]
+            - 확장: [기술 확장성]
+            - 최적화: [최적화 방안]
 
-            # 개선 사항
-            - 보완점: [주요 보완 사항]
-            - 방안: [개선 방법]
-            - 주의점: [고려 사항]
-            - 효과: [예상 효과]
+            # 보완 사항
+            - 명세서: [명세서 보완점]
+            - 청구항: [권리범위 조정]
+            - 도면: [도면 보완사항]
+            - 실시예: [실시예 추가]
 
             주의사항:
             1. 각 섹션은 반드시 '# '으로 시작
             2. 모든 항목은 반드시 '- '으로 시작
             3. 빈 줄은 섹션 구분에만 사용
-            4. 실제 글로벌 벤처투자 사례와 데이터에 기반하여 구체적인 수치와 전략을 제시"""),
+            4. 실제 특허 사례와 기술 동향을 반영하여 구체적인 분석 제시"""),
             
             ("human", """사업계획서 요약: {summary}""")
         ])
@@ -288,10 +295,10 @@ class LangChainService:
             
             # 섹션 매핑 정의
             section_mapping = {
-                '유사 사례': 'case_studies',
-                '실현 가능성': 'feasibility',
-                '발전 방향': 'development_plan',
-                '개선 사항': 'improvements'
+                '선행기술 분석': 'case_studies',
+                '기술적 실현성': 'feasibility',
+                '기술 발전성': 'development_plan',
+                '보완 사항': 'improvements'
             }
             
             # 분석 결과 파싱
@@ -335,14 +342,15 @@ class LangChainService:
             # 원본 입력 데이터를 결과에 포함
             analysis_result.update({
                 'idea': data.get('idea', ''),
-                'category': data.get('category', ''),
-                'approach': data.get('approach', ''),
-                'target': data.get('target', ''),
                 'problem': data.get('problem', ''),
-                'solution': data.get('solution', ''),
-                'implementation': data.get('implementation', ''),
-                'goals': data.get('goals', ''),
-                'needs': data.get('needs', '')
+                'mechanism': data.get('mechanism', ''),
+                'difference': data.get('difference', ''),
+                'components': data.get('components', ''),
+                'effects': data.get('effects', ''),
+                'limitations': data.get('limitations', ''),
+                'industry': data.get('industry', ''),
+                'specifications': data.get('specifications', ''),
+                'status': data.get('status', '')
             })
             
             return analysis_result

@@ -35,85 +35,92 @@ init_db()
 # AI 분석 서비스 인스턴스
 langchain_service = LangChainService()
 
-# 대화 상태 정의 - 각 상태는 하나의 질문/응답 단계를 나타냅니다
-(WAITING_START, 
- IDEA,           # 아이디어 설명 (자유 입력)
- CATEGORY,       # 서비스 분야 선택
- APPROACH,       # 접근 방식 선택
- TARGET,         # 타겟 고객 선택
- PROBLEM,        # 해결할 문제 선택
- SOLUTION,       # 해결 방안 선택
- IMPLEMENTATION, # 구현 기술 선택
- GOALS,          # 목표 선택
- NEEDS,          # 필요 사항 선택
+# 대화 상태 정의
+(WAITING_START,
+ IDEA,           # 기술 개요 (자유 입력)
+ PROBLEM,        # 기술적 문제점
+ MECHANISM,      # 핵심 작동 원리
+ DIFFERENCE,     # 기존 기술과의 차별점
+ COMPONENTS,     # 구성요소와 작동 방식
+ EFFECTS,        # 기술적 효과
+ LIMITATIONS,    # 기술적 한계
+ INDUSTRY,       # 산업 분야
+ SPECIFICATIONS, # 물리적 특성
+ STATUS,         # 개발 상태
  ANALYZING,      # AI 분석 중
- HELP_MENU) = range(12)
+ HELP_MENU) = range(13)
 
-# 키보드 메뉴 정의 - 각 단계별로 사용자에게 제공할 선택지를 구성합니다
-# 필요에 따라 옵션을 수정하거나 새로운 키보드를 추가할 수 있습니다
+# 키보드 메뉴 정의
 
-# 서비스 분야 선택 옵션
-CATEGORY_KEYBOARD = [
-    ['🚀 서비스/앱', '💡 콘텐츠/미디어'],
-    ['🤖 AI/데이터', '🎮 게임/엔터'],
-    ['🏥 건강/의료', '🎓 교육/이러닝'],
-    ['💰 금융/핀테크', '🛍️ 커머스/유통'],
-    ['✨ 직접 입력']
-]
-
-# 서비스 형태 선택 옵션
-APPROACH_KEYBOARD = [
-    ['💫 B2C 서비스', '🎯 B2B 서비스'],
-    ['🤝 B2B2C 서비스', '💡 하드웨어'],
-    ['📊 플랫폼', '🌱 콘텐츠'],
-    ['✨ 직접 입력']
-]
-
-# 타겟 고객 선택 옵션
-TARGET_KEYBOARD = [
-    ['👥 일반 소비자', '👨‍👩‍👧‍👦 가족/육아'],
-    ['👨‍💼 직장인', '🎓 학생'],
-    ['💼 소상공인', '🏢 기업'],
-    ['✨ 직접 입력']
-]
-
-# 문제 유형 선택 옵션
+# 문제점 유형 선택 옵션
 PROBLEM_KEYBOARD = [
-    ['⏰ 시간/비용 절약', '📈 생산성 향상'],
-    ['😊 편의성/접근성', '🤝 소통/협업'],
-    ['💡 정보/지식 습득', '🎯 목표 달성'],
+    ['🔧 성능/효율성', '💡 기술적 한계'],
+    ['⚡ 에너지/자원', '🔒 보안/안전성'],
+    ['💰 비용/생산성', '🌍 환경 영향'],
     ['✨ 직접 입력']
 ]
 
-# 해결 방식 선택 옵션
-SOLUTION_KEYBOARD = [
-    ['📱 모바일 앱', '💻 웹 서비스'],
-    ['🤖 AI 솔루션', '🎮 게임/콘텐츠'],
-    ['🛠️ 자동화 도구', '🤝 플랫폼'],
+# 작동 원리 선택 옵션
+MECHANISM_KEYBOARD = [
+    ['⚙️ 기계/물리', '🔌 전기/전자'],
+    ['💻 소프트웨어', '🤖 AI/데이터'],
+    ['🧪 화학/생물', '📡 통신/네트워크'],
     ['✨ 직접 입력']
 ]
 
-# 구현 기술 선택 옵션
-IMPLEMENTATION_KEYBOARD = [
-    ['📱 iOS/Android', '💻 웹/크로스플랫폼'],
-    ['☁️ 클라우드/서버', '🤖 AI/ML'],
-    ['🎮 게임엔진', '🔒 블록체인'],
+# 차별점 선택 옵션
+DIFFERENCE_KEYBOARD = [
+    ['📈 성능 향상', '💰 비용 절감'],
+    ['⚡ 효율 개선', '🔒 안전성 강화'],
+    ['🌟 혁신 기술', '♻️ 지속가능성'],
     ['✨ 직접 입력']
 ]
 
-# 목표 선택 옵션
-GOALS_KEYBOARD = [
-    ['📈 매출/성장', '👥 유저 확보'],
-    ['🌟 브랜드 인지도', '🤝 파트너십'],
-    ['💰 투자 유치', '🌍 해외 진출'],
+# 구성요소 선택 옵션
+COMPONENTS_KEYBOARD = [
+    ['🔧 기계 부품', '🔌 전자 부품'],
+    ['💾 제어 장치', '📱 인터페이스'],
+    ['🧮 프로세서', '💽 저장 장치'],
     ['✨ 직접 입력']
 ]
 
-# 필요 사항 선택 옵션
-NEEDS_KEYBOARD = [
-    ['👨‍💻 개발 인력', '🎨 기획/디자인'],
-    ['💰 초기 투자금', '📊 시장 검증'],
-    ['🤝 파트너/멘토', '📢 마케팅'],
+# 기술 효과 선택 옵션
+EFFECTS_KEYBOARD = [
+    ['⚡ 효율 증가', '💰 비용 감소'],
+    ['🔒 안전성 향상', '♻️ 환경 개선'],
+    ['📈 성능 향상', '🌟 품질 개선'],
+    ['✨ 직접 입력']
+]
+
+# 기술 한계 선택 옵션
+LIMITATIONS_KEYBOARD = [
+    ['💰 높은 비용', '⚡ 전력 소비'],
+    ['🌡️ 온도 제약', '⏱️ 처리 속도'],
+    ['🔒 보안 위험', '🔧 유지보수'],
+    ['✨ 직접 입력']
+]
+
+# 산업 분야 선택 옵션
+INDUSTRY_KEYBOARD = [
+    ['🏭 제조/생산', '🔌 전기/전자'],
+    ['🚗 자동차/운송', '🏥 의료/바이오'],
+    ['🌍 환경/에너지', '🤖 IT/소프트웨어'],
+    ['✨ 직접 입력']
+]
+
+# 물리적 특성 선택 옵션
+SPECIFICATIONS_KEYBOARD = [
+    ['📏 크기/무게', '⚡ 전력/성능'],
+    ['🌡️ 온도/환경', '⏱️ 속도/정확도'],
+    ['🔧 내구성/수명', '🔌 호환성/규격'],
+    ['✨ 직접 입력']
+]
+
+# 개발 상태 선택 옵션
+STATUS_KEYBOARD = [
+    ['💡 개념 설계', '📝 상세 설계'],
+    ['🛠️ 시제품 제작', '🔬 성능 검증'],
+    ['📊 시험 평가', '📋 특허 출원'],
     ['✨ 직접 입력']
 ]
 
@@ -185,57 +192,12 @@ async def handle_start_response(update: Update, context: ContextTypes.DEFAULT_TY
 
 async def handle_idea(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    아이디어 입력 처리 핸들러
+    기술 개요 입력 처리 핸들러
     
-    사용자가 입력한 아이디어 설명을 저장하고
-    다음 단계(서비스 분야 선택)로 진행합니다.
+    사용자가 입력한 기술 설명을 저장하고
+    다음 단계(기술적 문제점)로 진행합니다.
     """
     context.user_data['idea'] = update.message.text
-    reply_markup = ReplyKeyboardMarkup(CATEGORY_KEYBOARD, resize_keyboard=True)
-    await update.message.reply_text(
-        Elon.QUESTIONS['category'],
-        reply_markup=reply_markup
-    )
-    return CATEGORY
-
-async def handle_category(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    서비스 분야 선택 처리 핸들러
-    
-    사용자가 선택한 서비스 분야를 저장하고
-    다음 단계(서비스 형태 선택)로 진행합니다.
-    """
-    context.user_data['category'] = update.message.text
-    reply_markup = ReplyKeyboardMarkup(APPROACH_KEYBOARD, resize_keyboard=True)
-    await update.message.reply_text(
-        Elon.QUESTIONS['approach'],
-        reply_markup=reply_markup
-    )
-    return APPROACH
-
-async def handle_approach(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    서비스 형태 선택 처리 핸들러
-    
-    사용자가 선택한 서비스 형태를 저장하고
-    다음 단계(타겟 고객 선택)로 진행합니다.
-    """
-    context.user_data['approach'] = update.message.text
-    reply_markup = ReplyKeyboardMarkup(TARGET_KEYBOARD, resize_keyboard=True)
-    await update.message.reply_text(
-        Elon.QUESTIONS['target'],
-        reply_markup=reply_markup
-    )
-    return TARGET
-
-async def handle_target(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    타겟 고객 선택 처리 핸들러
-    
-    사용자가 선택한 타겟 고객을 저장하고
-    다음 단계(문제 유형 선택)로 진행합니다.
-    """
-    context.user_data['target'] = update.message.text
     reply_markup = ReplyKeyboardMarkup(PROBLEM_KEYBOARD, resize_keyboard=True)
     await update.message.reply_text(
         Elon.QUESTIONS['problem'],
@@ -245,72 +207,132 @@ async def handle_target(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_problem(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    문제 유형 선택 처리 핸들러
+    기술적 문제점 처리 핸들러
     
-    사용자가 선택한 문제 유형을 저장하고
-    다음 단계(해결 방식 선택)로 진행합니다.
+    사용자가 선택한 문제점을 저장하고
+    다음 단계(핵심 작동 원리)로 진행합니다.
     """
     context.user_data['problem'] = update.message.text
-    reply_markup = ReplyKeyboardMarkup(SOLUTION_KEYBOARD, resize_keyboard=True)
+    reply_markup = ReplyKeyboardMarkup(MECHANISM_KEYBOARD, resize_keyboard=True)
     await update.message.reply_text(
-        Elon.QUESTIONS['solution'],
+        Elon.QUESTIONS['mechanism'],
         reply_markup=reply_markup
     )
-    return SOLUTION
+    return MECHANISM
 
-async def handle_solution(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_mechanism(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    해결 방식 선택 처리 핸들러
+    핵심 작동 원리 처리 핸들러
     
-    사용자가 선택한 해결 방식을 저장하고
-    다음 단계(구현 기술 선택)로 진행합니다.
+    사용자가 선택한 작동 원리를 저장하고
+    다음 단계(기존 기술과의 차별점)로 진행합니다.
     """
-    context.user_data['solution'] = update.message.text
-    reply_markup = ReplyKeyboardMarkup(IMPLEMENTATION_KEYBOARD, resize_keyboard=True)
+    context.user_data['mechanism'] = update.message.text
+    reply_markup = ReplyKeyboardMarkup(DIFFERENCE_KEYBOARD, resize_keyboard=True)
     await update.message.reply_text(
-        Elon.QUESTIONS['implementation'],
+        Elon.QUESTIONS['difference'],
         reply_markup=reply_markup
     )
-    return IMPLEMENTATION
+    return DIFFERENCE
 
-async def handle_implementation(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_difference(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    구현 기술 선택 처리 핸들러
+    차별점 처리 핸들러
     
-    사용자가 선택한 구현 기술을 저장하고
-    다음 단계(목표 선택)로 진행합니다.
+    사용자가 선택한 차별점을 저장하고
+    다음 단계(구성요소와 작동 방식)로 진행합니다.
     """
-    context.user_data['implementation'] = update.message.text
-    reply_markup = ReplyKeyboardMarkup(GOALS_KEYBOARD, resize_keyboard=True)
+    context.user_data['difference'] = update.message.text
+    reply_markup = ReplyKeyboardMarkup(COMPONENTS_KEYBOARD, resize_keyboard=True)
     await update.message.reply_text(
-        Elon.QUESTIONS['goals'],
+        Elon.QUESTIONS['components'],
         reply_markup=reply_markup
     )
-    return GOALS
+    return COMPONENTS
 
-async def handle_goals(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_components(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    목표 선택 처리 핸들러
+    구성요소 처리 핸들러
     
-    사용자가 선택한 목표를 저장하고
-    다음 단계(필요 사항 선택)로 진행합니다.
+    사용자가 선택한 구성요소를 저장하고
+    다음 단계(기술적 효과)로 진행합니다.
     """
-    context.user_data['goals'] = update.message.text
-    reply_markup = ReplyKeyboardMarkup(NEEDS_KEYBOARD, resize_keyboard=True)
+    context.user_data['components'] = update.message.text
+    reply_markup = ReplyKeyboardMarkup(EFFECTS_KEYBOARD, resize_keyboard=True)
     await update.message.reply_text(
-        Elon.QUESTIONS['needs'],
+        Elon.QUESTIONS['effects'],
         reply_markup=reply_markup
     )
-    return NEEDS
+    return EFFECTS
 
-async def handle_needs(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def handle_effects(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    필요 사항 선택 처리 핸들러
+    기술적 효과 처리 핸들러
     
-    사용자가 선택한 필요 사항을 저장하고
+    사용자가 선택한 효과를 저장하고
+    다음 단계(기술적 한계)로 진행합니다.
+    """
+    context.user_data['effects'] = update.message.text
+    reply_markup = ReplyKeyboardMarkup(LIMITATIONS_KEYBOARD, resize_keyboard=True)
+    await update.message.reply_text(
+        Elon.QUESTIONS['limitations'],
+        reply_markup=reply_markup
+    )
+    return LIMITATIONS
+
+async def handle_limitations(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    기술적 한계 처리 핸들러
+    
+    사용자가 선택한 한계를 저장하고
+    다음 단계(산업 분야)로 진행합니다.
+    """
+    context.user_data['limitations'] = update.message.text
+    reply_markup = ReplyKeyboardMarkup(INDUSTRY_KEYBOARD, resize_keyboard=True)
+    await update.message.reply_text(
+        Elon.QUESTIONS['industry'],
+        reply_markup=reply_markup
+    )
+    return INDUSTRY
+
+async def handle_industry(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    산업 분야 처리 핸들러
+    
+    사용자가 선택한 산업 분야를 저장하고
+    다음 단계(물리적 특성)로 진행합니다.
+    """
+    context.user_data['industry'] = update.message.text
+    reply_markup = ReplyKeyboardMarkup(SPECIFICATIONS_KEYBOARD, resize_keyboard=True)
+    await update.message.reply_text(
+        Elon.QUESTIONS['specifications'],
+        reply_markup=reply_markup
+    )
+    return SPECIFICATIONS
+
+async def handle_specifications(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    물리적 특성 처리 핸들러
+    
+    사용자가 선택한 특성을 저장하고
+    다음 단계(개발 상태)로 진행합니다.
+    """
+    context.user_data['specifications'] = update.message.text
+    reply_markup = ReplyKeyboardMarkup(STATUS_KEYBOARD, resize_keyboard=True)
+    await update.message.reply_text(
+        Elon.QUESTIONS['status'],
+        reply_markup=reply_markup
+    )
+    return STATUS
+
+async def handle_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    개발 상태 처리 핸들러
+    
+    사용자가 선택한 개발 상태를 저장하고
     AI 분석을 시작합니다.
     """
-    context.user_data['needs'] = update.message.text
+    context.user_data['status'] = update.message.text
     
     try:
         # 분석 시작 메시지 전송
@@ -484,27 +506,26 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     return ConversationHandler.END
 
-# 대화 핸들러 생성 - 봇의 전체 대화 흐름을 정의합니다
+# 대화 핸들러 생성
 analysis_conversation = ConversationHandler(
-    # 시작점 - 봇과의 대화를 시작할 수 있는 명령어들
     entry_points=[
         CommandHandler("start", start_conversation),
         CommandHandler("help", help_command),
         CommandHandler("cancel", cancel)
     ],
     
-    # 상태별 핸들러 - 각 상태에서 처리할 수 있는 사용자 입력 정의
     states={
         WAITING_START: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_start_response)],
         IDEA: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_idea)],
-        CATEGORY: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_category)],
-        APPROACH: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_approach)],
-        TARGET: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_target)],
         PROBLEM: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_problem)],
-        SOLUTION: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_solution)],
-        IMPLEMENTATION: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_implementation)],
-        GOALS: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_goals)],
-        NEEDS: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_needs)],
+        MECHANISM: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_mechanism)],
+        DIFFERENCE: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_difference)],
+        COMPONENTS: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_components)],
+        EFFECTS: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_effects)],
+        LIMITATIONS: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_limitations)],
+        INDUSTRY: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_industry)],
+        SPECIFICATIONS: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_specifications)],
+        STATUS: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_status)],
         ANALYZING: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_analysis)],
         HELP_MENU: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_help_menu)]
     },
